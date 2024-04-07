@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: tests
+  cloud:
+    config:
+      uri: http://config-service/isra/config-service/
+      failFast: true
+
+---
+spring:
+  config:
+    activate:
+      on-profile: local, test
+  cloud:
+    config:
+      uri: https://localhost:8888
+      enabled: false
