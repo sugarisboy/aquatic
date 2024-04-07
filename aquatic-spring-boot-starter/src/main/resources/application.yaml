@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: aquatic
+
+springdoc:
+  api-docs:
+    path: /api-docs
+

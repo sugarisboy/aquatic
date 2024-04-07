@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: aquatic
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: "jdbc:postgresql://localhost:5432/aquatic"
+    username: "user"
+    password: "pass"
+
+springdoc:
+  api-docs:
+    path: /api-docs
+
