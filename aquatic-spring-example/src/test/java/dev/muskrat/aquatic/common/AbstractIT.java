@@ -2,17 +2,20 @@ package dev.muskrat.aquatic.common;
 
 
 import dev.muskrat.aquatic.example.AquaticApplication;
+import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.util.TestPropertyValues;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 @Testcontainers
+@RunWith(SpringRunner.class)
 @ActiveProfiles("test")
 @ContextConfiguration(initializers = {AbstractIT.PsqlInitializer.class})
 @SpringBootTest(classes = AquaticApplication.class)

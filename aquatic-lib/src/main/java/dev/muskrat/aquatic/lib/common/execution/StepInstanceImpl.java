@@ -4,6 +4,7 @@ import dev.muskrat.aquatic.lib.common.execution.StepInstance;
 import dev.muskrat.aquatic.lib.common.declaration.StepDeclaration;
 import dev.muskrat.aquatic.lib.common.dto.StepStatus;
 import lombok.Getter;
+import java.util.List;
 
 public class StepInstanceImpl implements StepInstance {
 
@@ -46,10 +47,18 @@ public class StepInstanceImpl implements StepInstance {
 
     @Override
     public void skipped() {
-        if (status != StepStatus.IN_QUEUE) {
-            throw new IllegalStateException("Статус SKIPPED может быть запущен только из статуса IN_QUEUE");
+        if (isFinished()) {
+            throw new IllegalStateException("Статус SKIPPED может быть запущен только из нефинального статуса");
         }
         this.status = StepStatus.SKIPPED;
+    }
+
+    @Override
+    public boolean isFinished() {
+        return switch (status) {
+            case IN_QUEUE, IN_PROGRESS -> false;
+            case FAILURE, SKIPPED, SUCCESS -> true;
+        };
     }
 
     @Override

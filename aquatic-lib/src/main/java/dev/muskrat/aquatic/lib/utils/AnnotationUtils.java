@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 public class AnnotationUtils {
 
     public static <T> Optional<T> findClassAnnotation(Class<?> aClass, Class<T> tClass) {
-        return (Optional<T>) Arrays.stream(aClass.getAnnotations())
+        return (Optional<T>) Arrays.stream(ultimateTargetClass(aClass).getAnnotations())
                 .filter(annotation -> annotation.annotationType().equals(tClass))
                 .findFirst();
     }
@@ -51,7 +51,7 @@ public class AnnotationUtils {
     }
 
     public static <T> Optional<AnnotatedMethod<T>> findAnnotatedMethod(Class<?> aClass, Class<T> tClass) {
-        return Arrays.stream(aClass.getDeclaredMethods())
+        return Arrays.stream(ultimateTargetClass(aClass).getDeclaredMethods())
                 .filter(method -> findMethodAnnotation(method, tClass).isPresent())
                 .map(method -> new AnnotatedMethod<>(method, findMethodAnnotation(method, tClass).get()))
                 .findFirst();
@@ -82,11 +82,24 @@ public class AnnotationUtils {
             return Collections.emptyList();
         }
 
-        Class<?> aClass = instanceOfClass.getClass();
+        Class<?> aClass = ultimateTargetClass(instanceOfClass.getClass());
         return Arrays.stream(aClass.getDeclaredMethods())
                 .filter(method -> findMethodAnnotation(method, annotation).isPresent())
                 .map(method -> new AnnotatedMethod<>(method, findMethodAnnotation(method, annotation).get()))
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * Возвращает исходный класс в случае проксирования
+     * @param tClass Исходный класс или прокси
+     * @return Исходный класс
+     */
+    private static Class<?> ultimateTargetClass(Class<?> tClass) {
+        while (tClass != null && tClass.getName().contains("$$")) {
+            tClass = tClass.getSuperclass();
+        }
+
+        return tClass;
     }
 
     public record AnnotatedMethod<T>(Method method, T annotation) {

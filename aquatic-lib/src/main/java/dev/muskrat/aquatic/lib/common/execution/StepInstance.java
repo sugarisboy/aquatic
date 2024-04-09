@@ -18,4 +18,6 @@ public interface StepInstance {
     void executeStep();
 
     void skipped();
+
+    boolean isFinished();
 }

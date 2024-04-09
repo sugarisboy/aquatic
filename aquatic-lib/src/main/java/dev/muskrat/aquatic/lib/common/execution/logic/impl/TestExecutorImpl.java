@@ -1,6 +1,5 @@
 package dev.muskrat.aquatic.lib.common.execution.logic.impl;
 
-import com.codeborne.selenide.Selenide;
 import com.codeborne.selenide.WebDriverRunner;
 import dev.muskrat.aquatic.lib.common.execution.StepInstance;
 import dev.muskrat.aquatic.lib.common.execution.TestInstance;
@@ -43,22 +42,31 @@ public class TestExecutorImpl implements TestExecutor {
             eventProducer.startTest(instance);
 
             boolean isSuccess = true;
-            for (int i = 1; i <= instance.getSteps().size(); i++) {
-                StepInstance step = instance.getSteps().get(i - 1);
-                StepStatus stepStatus = executeStep(i, instance, step);
+
+            for (int index = 0, stepIndex = 1; index < instance.getSteps().size(); index++, stepIndex++) {
+                StepInstance step = instance.getSteps().get(index);
+                StepStatus stepStatus = executeStep(stepIndex, instance, step);
                 if (stepStatus != StepStatus.SUCCESS) {
                     log.warn("[TEST::{}::{}] Тест провален на шаге {}. {}", instance.getId(), testDeclaration.getName(),
-                            i, step.getDeclaration().getName());
+                            stepIndex, step.getDeclaration().getName());
 
                     instance.failure();
-                    for (int q = i + 1; q <= instance.getSteps().size(); q++) {
-                        log.info("[TEST::{}::{}] Шаг помечен как пропущенный {}. {}", instance.getId(), testDeclaration.getName(),
-                                i, step.getDeclaration().getName());
-                        instance.getSteps().get(i - 1).skipped();
-                    }
-
                     isSuccess = false;
                     break;
+                }
+            }
+
+            for (int index = 0, stepIndex = 1; index < instance.getSteps().size(); index++, stepIndex++) {
+                StepInstance step = instance.getSteps().get(index);
+
+                if (!step.isFinished()) {
+                    log.info("[TEST::{}::{}] Шаг помечен как пропущенный {}. {}",
+                            instance.getId(),
+                            testDeclaration.getName(),
+                            stepIndex,
+                            step.getDeclaration().getName()
+                    );
+                    step.skipped();
                 }
             }
 

@@ -59,22 +59,31 @@ public class TestInstanceFactoryImpl implements TestInstanceFactory {
             throw new IllegalStateException("Execution method can't be null");
         }
 
-        Object instanceOfClass = parameterizedStepDeclaration.getConsumerParametrisedStep() == null
-                ? stepDeclaration.getInstanceOfClass()
-                : parameterizedStepDeclaration.getConsumerParametrisedStep().get();
+        String stepId = stepDeclaration.getId();
+        Object[] args;
+        if (stepDeclaration.isAnnouncedAsClass() && parameterizedStepDeclaration.getConsumerParametrisedStep() != null) {
+            Object stepParams = parameterizedStepDeclaration.getConsumerParametrisedStep().get();
+            args = new Object[]{context, stepParams};
+        } else {
+            args = new Object[]{context};
+        }
 
-        Object instanceOfStep = stepDeclaration.isAnnouncedAsClass()
-                ? instanceOfClass
-                : stepDeclaration.getInstanceOfClass();
-
-        Runnable runnable = () -> {
-            try {
-                executionMethod.invoke(instanceOfStep, context);
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                throw new AquaticTestExecutionFailedException("Не может быть вызван корректно шаг " + stepDeclaration.getId(), e);
-            }
-        };
+        Runnable runnable = invokeAsRunnable(stepId, stepDeclaration.getInstanceOfClass(), executionMethod, args);
 
         return new StepInstanceImpl(stepDeclaration, runnable);
+    }
+
+    // instance.method(args)
+    private Runnable invokeAsRunnable(String stepId, Object instance, Method method, Object[] args) {
+        return  () -> {
+            try {
+                method.invoke(instance, args);
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                throw new AquaticTestExecutionFailedException("Не может быть вызван корректно шаг " + stepId, e);
+            } catch (Exception e) {
+                log.error("Ошибка выполнения шага {} stepId", stepId, e);
+                throw new AquaticTestExecutionFailedException("Ошибка выполнения шага " + stepId + " stepId", e);
+            }
+        };
     }
 }
