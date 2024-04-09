@@ -43,6 +43,6 @@ public class TestDeclaration {
     /**
      * Декларация последовательности шагов данного теста
      */
-    private List<StepDeclaration> steps;
+    private List<ParameterizedStepDeclaration> steps;
 
 }

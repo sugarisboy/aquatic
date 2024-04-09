@@ -1,5 +1,6 @@
 package dev.muskrat.aquatic.lib.common.execution.logic.impl;
 
+import dev.muskrat.aquatic.lib.common.declaration.ParameterizedStepDeclaration;
 import dev.muskrat.aquatic.lib.common.execution.StepInstance;
 import dev.muskrat.aquatic.lib.common.execution.StepInstanceImpl;
 import dev.muskrat.aquatic.lib.common.execution.TestInstance;
@@ -51,17 +52,26 @@ public class TestInstanceFactoryImpl implements TestInstanceFactory {
         }
     }
 
-    private StepInstance createStepInstance(StepDeclaration stepDeclaration, Object context) {
+    private StepInstance createStepInstance(ParameterizedStepDeclaration parameterizedStepDeclaration, Object context) {
+        StepDeclaration stepDeclaration = parameterizedStepDeclaration.getStepDeclaration();
         Method executionMethod = stepDeclaration.getExecutionMethod();
         if (executionMethod == null) {
             throw new IllegalStateException("Execution method can't be null");
         }
 
+        Object instanceOfClass = parameterizedStepDeclaration.getConsumerParametrisedStep() == null
+                ? stepDeclaration.getInstanceOfClass()
+                : parameterizedStepDeclaration.getConsumerParametrisedStep().get();
+
+        Object instanceOfStep = stepDeclaration.isAnnouncedAsClass()
+                ? instanceOfClass
+                : stepDeclaration.getInstanceOfClass();
+
         Runnable runnable = () -> {
             try {
-                executionMethod.invoke(stepDeclaration.getInstanceOfClass(), context);
+                executionMethod.invoke(instanceOfStep, context);
             } catch (IllegalAccessException | InvocationTargetException e) {
-                throw new AquaticTestExecutionFailedException("Can't be executed step " + stepDeclaration.getId(), e);
+                throw new AquaticTestExecutionFailedException("Не может быть вызван корректно шаг " + stepDeclaration.getId(), e);
             }
         };
 

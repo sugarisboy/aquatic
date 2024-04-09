@@ -1,6 +1,8 @@
 package dev.muskrat.aquatic.lib.common.declaration;
 
 
+import dev.muskrat.aquatic.lib.common.AquaticLambdaSerializable;
+import dev.muskrat.aquatic.lib.common.AquaticParametrizedStepRunnable;
 import dev.muskrat.aquatic.lib.common.AquaticStepHandler;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +24,7 @@ import java.util.List;
 public class TestTemplate<T> {
 
     private final Class<T> type;
-    public List<AquaticStepHandler<T>> stepRunnables = new ArrayList<>();
+    public List<AquaticLambdaSerializable> stepRunnables = new ArrayList<>();
 
     /**
      * Добавляет к шаблону в цепочку вызов один из шагов.
@@ -54,6 +56,17 @@ public class TestTemplate<T> {
         this.stepRunnables.add(runnable);
         return this;
     }
+
+    /**
+     * Аналогично {@link #then(AquaticStepHandler)}, но для статической ссылки на параметризованный шаг
+     * @param runnable ссылка на метод для шага
+     * @return шаблон теста, ответ использовать никак не требуется
+     */
+    public TestTemplate<T> then(AquaticParametrizedStepRunnable runnable) {
+        this.stepRunnables.add(runnable);
+        return this;
+    }
+
 
     /**
      * Указывает для какого типа контекста будет использоваться в рамках данного теста

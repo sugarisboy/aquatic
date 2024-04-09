@@ -37,13 +37,13 @@ public class WriteToSearchGoogleStep {
         context.setSearch(searchText);
     }
 
-    public static WriteToSearchGoogleStep searchCake(GoogleTestContext context) {
+    public static WriteToSearchGoogleStep searchCake() {
         return WriteToSearchGoogleStep.builder()
                 .searchText("cake")
                 .build();
     };
 
-    public static WriteToSearchGoogleStep searchDonat(GoogleTestContext context) {
+    public static WriteToSearchGoogleStep searchDonat() {
         return WriteToSearchGoogleStep.builder()
                 .searchText("donat")
                 .build();

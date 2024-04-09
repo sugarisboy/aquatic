@@ -23,6 +23,7 @@ import dev.muskrat.aquatic.lib.common.mapper.MainMapper;
 import dev.muskrat.aquatic.lib.common.mapper.MainMapperImpl;
 import dev.muskrat.aquatic.lib.selenide.DriverFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.context.ApplicationEventPublisher;
@@ -36,9 +37,12 @@ import org.springframework.context.annotation.Configuration;
 @ComponentScan(basePackages = "dev.muskrat.aquatic")
 public class AquaticConfiguration {
 
+    @Value("${selenide.chromedriver}")
+    private String chromedriverPath;
+
     @Bean
     public DriverFactory driverFactory() {
-        return new DriverFactory();
+        return new DriverFactory(chromedriverPath);
     }
 
     @Bean

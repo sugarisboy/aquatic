@@ -3,16 +3,24 @@ package dev.muskrat.aquatic.lib.selenide;
 import com.codeborne.selenide.Configuration;
 import com.codeborne.selenide.FileDownloadMode;
 import com.codeborne.selenide.Selenide;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import java.util.Objects;
 
 @Slf4j
+@NoArgsConstructor
 public class DriverFactory {
 
+    private String chromedriverPath;
     private ChromeOptions options = options();
+
+    public DriverFactory(String chromedriverPath) {
+        this.chromedriverPath = chromedriverPath;
+    }
 
     public ChromeDriver newWindow() {
         Boolean driver = null;
@@ -55,7 +63,7 @@ public class DriverFactory {
         if (isWindows()) {
             //options.addArguments("--auto-open-devtools-for-tabs");
 
-            System.setProperty("webdriver.chrome.driver", "chromedriver.exe");
+            System.setProperty("webdriver.chrome.driver", Objects.requireNonNullElse(chromedriverPath, "chromedriver.exe"));
             if (System.getProperty("background") != null) {
                 Configuration.headless = true;
             } else {
@@ -64,7 +72,7 @@ public class DriverFactory {
             }
             options.addArguments("--disable-gpu"); // applicable to windows os only
         } else {
-            System.setProperty("webdriver.chrome.driver", "chromedriver");
+            System.setProperty("webdriver.chrome.driver",  Objects.requireNonNullElse(chromedriverPath, "chromedriver"));
             Configuration.headless = true;
         }
 

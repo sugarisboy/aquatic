@@ -47,7 +47,7 @@ public class MainMapperImpl implements MainMapper {
     @Override
     public TestDeclarationDto map(TestDeclaration declaration) {
         List<StepDeclarationDto> steps = declaration.getSteps().stream()
-                .map(this::map)
+                .map(i -> map(i.getStepDeclaration()))
                 .toList();
 
         return new TestDeclarationDto(

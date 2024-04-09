@@ -1,9 +1,7 @@
 package dev.muskrat.aquatic.lib.common;
 
-import java.io.Serializable;
-
 @FunctionalInterface
-public interface AquaticStepHandler<T> extends Serializable {
+public interface AquaticStepHandler<T> extends AquaticLambdaSerializable {
 
     void run(T t);
 }

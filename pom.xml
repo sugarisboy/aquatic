@@ -5,7 +5,7 @@
 
 	<groupId>dev.muskrat</groupId>
 	<artifactId>aquatic</artifactId>
-	<version>1.0.0</version>
+	<version>1.1.0</version>
 	<name>aquatic</name>
 	<description>Aquatic automation test framework</description>
 
@@ -19,6 +19,9 @@
 
     <properties>
 		<java.version>20</java.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.compiler.source>1.7</maven.compiler.source>
+		<maven.compiler.target>1.7</maven.compiler.target>
 	</properties>
 
 	<dependencies>
@@ -28,18 +31,10 @@
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-				<configuration>
-					<excludes>
-						<exclude>
-							<groupId>org.projectlombok</groupId>
-							<artifactId>lombok</artifactId>
-						</exclude>
-					</excludes>
-				</configuration>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.12.1</version>
 			</plugin>
 		</plugins>
 	</build>
-
 </project>

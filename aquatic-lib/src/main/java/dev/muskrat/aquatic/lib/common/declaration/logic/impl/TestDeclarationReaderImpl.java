@@ -4,10 +4,11 @@ import static dev.muskrat.aquatic.lib.utils.AnnotationUtils.findAnnotatedMethod;
 import static dev.muskrat.aquatic.lib.utils.AnnotationUtils.findClassAnnotation;
 import static dev.muskrat.aquatic.lib.utils.AnnotationUtils.findMethodsWithAnnotation;
 
+import dev.muskrat.aquatic.lib.common.AquaticLambdaSerializable;
 import dev.muskrat.aquatic.lib.common.annotations.AquaticStep;
 import dev.muskrat.aquatic.lib.common.annotations.AquaticStepExecution;
 import dev.muskrat.aquatic.lib.common.annotations.AquaticTestTemplate;
-import dev.muskrat.aquatic.lib.common.AquaticStepHandler;
+import dev.muskrat.aquatic.lib.common.declaration.ParameterizedStepDeclaration;
 import dev.muskrat.aquatic.lib.common.declaration.logic.TestDeclarationReader;
 import dev.muskrat.aquatic.lib.common.exception.AquaticTestTemplateInitializingException;
 import dev.muskrat.aquatic.lib.common.declaration.StepDeclaration;
@@ -54,11 +55,11 @@ public class TestDeclarationReaderImpl implements TestDeclarationReader {
         TestTemplate<?> testTemplate = invoke(instanceOfClass, method);
         Class<?> contextType = testTemplate.getType();
 
-        List<? extends AquaticStepHandler<?>> stepRunnables = testTemplate.getStepRunnables();
+        List<AquaticLambdaSerializable> stepRunnables = testTemplate.getStepRunnables();
 
         int argNumber = 0;
-        List<StepDeclaration> testStepDeclarations = new ArrayList<>();
-        for (AquaticStepHandler<?> stepRunnable : stepRunnables) {
+        List<ParameterizedStepDeclaration> testStepDeclarations = new ArrayList<>();
+        for (AquaticLambdaSerializable stepRunnable : stepRunnables) {
             argNumber++;
 
             Method stepMethod = LambdaUtils.unreferenceLambdaMethod(stepRunnable);
@@ -91,9 +92,16 @@ public class TestDeclarationReaderImpl implements TestDeclarationReader {
                                         stepMethod.getName(), AquaticStep.class.getSimpleName(), annotation.id()
                                 )
                         ));
-                testStepDeclarations.add(declaration);
+                testStepDeclarations.add(new ParameterizedStepDeclaration(declaration, () -> {
+                    try {
+                        return stepMethod.invoke(null);
+                    } catch (IllegalAccessException | InvocationTargetException e) {
+                        throw new RuntimeException(e);
+                    }
+                }));
 
             } else {
+
                 StepDeclaration declaration = steps.stream()
                         .filter(stepDeclaration -> stepDeclaration.getExecutionMethod().equals(stepMethod))
                         .findFirst()
@@ -103,7 +111,7 @@ public class TestDeclarationReaderImpl implements TestDeclarationReader {
                                         stepMethod.getName(), AquaticStep.class.getSimpleName(), annotation.id()
                                 )
                         ));
-                testStepDeclarations.add(declaration);
+                testStepDeclarations.add(new ParameterizedStepDeclaration(declaration, null));
             }
 
 

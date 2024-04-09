@@ -1,5 +1,6 @@
 package dev.muskrat.aquatic.lib.common.events.logic.impl;
 
+import dev.muskrat.aquatic.lib.common.events.FinishedTestEvent;
 import dev.muskrat.aquatic.lib.common.events.StartedTestEvent;
 import dev.muskrat.aquatic.lib.common.events.logic.EventProducer;
 import dev.muskrat.aquatic.lib.common.events.logic.EventService;
@@ -26,7 +27,7 @@ public class EventProducerImpl implements EventProducer {
     @Override
     public void finishTest(TestInstance<?> instance) {
         eventService.publish(
-                new StartedTestEvent(
+                new FinishedTestEvent(
                         mapper.map(instance)
                 )
         );
