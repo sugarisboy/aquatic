@@ -20,14 +20,13 @@ import org.openqa.selenium.chrome.ChromeDriver;
 public class TestExecutorImpl implements TestExecutor {
 
     private final DriverFactory driverFactory;
-    private final TestInstanceFactory testInstanceFactory;
     private final EventProducer eventProducer;
 
     @Override
-    public void execute(TestDeclaration testDeclaration) {
-        TestInstanceImpl<?> instance = (TestInstanceImpl<?>) testInstanceFactory.createInstance(testDeclaration);
+    public void execute(TestInstance<?> testInstance) {
+        TestDeclaration testDeclaration = testInstance.getDeclaration();
 
-        log.info("[TEST::{}::{}] Запуск теста", instance.getId(), testDeclaration.getName());
+        log.info("[TEST::{}::{}] Запуск теста", testInstance.getId(), testDeclaration.getName());
         ChromeDriver chromeDriver = null;
 
         try {
@@ -37,31 +36,31 @@ public class TestExecutorImpl implements TestExecutor {
             }
             chromeDriver = (ChromeDriver) WebDriverRunner.getAndCheckWebDriver();
 
-            instance.inProgress();
+            testInstance.inProgress();
 
-            eventProducer.startTest(instance);
+            eventProducer.startTest(testInstance);
 
             boolean isSuccess = true;
 
-            for (int index = 0, stepIndex = 1; index < instance.getSteps().size(); index++, stepIndex++) {
-                StepInstance step = instance.getSteps().get(index);
-                StepStatus stepStatus = executeStep(stepIndex, instance, step);
+            for (int index = 0, stepIndex = 1; index < testInstance.getSteps().size(); index++, stepIndex++) {
+                StepInstance step = testInstance.getSteps().get(index);
+                StepStatus stepStatus = executeStep(stepIndex, testInstance, step);
                 if (stepStatus != StepStatus.SUCCESS) {
-                    log.warn("[TEST::{}::{}] Тест провален на шаге {}. {}", instance.getId(), testDeclaration.getName(),
+                    log.warn("[TEST::{}::{}] Тест провален на шаге {}. {}", testInstance.getId(), testDeclaration.getName(),
                             stepIndex, step.getDeclaration().getName());
 
-                    instance.failure();
+                    testInstance.failure();
                     isSuccess = false;
                     break;
                 }
             }
 
-            for (int index = 0, stepIndex = 1; index < instance.getSteps().size(); index++, stepIndex++) {
-                StepInstance step = instance.getSteps().get(index);
+            for (int index = 0, stepIndex = 1; index < testInstance.getSteps().size(); index++, stepIndex++) {
+                StepInstance step = testInstance.getSteps().get(index);
 
                 if (!step.isFinished()) {
                     log.info("[TEST::{}::{}] Шаг помечен как пропущенный {}. {}",
-                            instance.getId(),
+                            testInstance.getId(),
                             testDeclaration.getName(),
                             stepIndex,
                             step.getDeclaration().getName()
@@ -71,11 +70,11 @@ public class TestExecutorImpl implements TestExecutor {
             }
 
             if (isSuccess) {
-                instance.success();
-                log.info("[TEST::{}::{}] Тест успешно завершен!", instance.getId(), testDeclaration.getName());
+                testInstance.success();
+                log.info("[TEST::{}::{}] Тест успешно завершен!", testInstance.getId(), testDeclaration.getName());
             }
 
-            eventProducer.finishTest(instance);
+            eventProducer.finishTest(testInstance);
 
         } catch (Exception e) {
             throw new AquaticTestExecutionFailedException("Неизвестная ошибка при исполнении шагов теста", e);

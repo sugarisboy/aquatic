@@ -1,8 +1,9 @@
 package dev.muskrat.aquatic.lib.common.execution.logic;
 
+import com.google.common.collect.ImmutableList;
 import dev.muskrat.aquatic.lib.common.declaration.TestDeclaration;
-import java.util.List;
-import java.util.Optional;
+import dev.muskrat.aquatic.lib.common.execution.TestInstance;
+import java.util.UUID;
 
 /**
  * Набор потоков, которые способны исполнять тесты.
@@ -14,15 +15,18 @@ public interface TestPoolExecutor {
 
     /**
      * Добавляет декларацию теста в очередь запуска тестов
+     *
      * @param testDeclaration декларация
+     * @return ID тест рана для дальнейшего отслеживания
      */
-    void addToQueue(TestDeclaration testDeclaration);
+    UUID addToQueue(TestDeclaration testDeclaration);
 
     /**
      * Возвращает текущую очередь из тестов, которые еще не были запущены и ожидают начала исполнения
+     *
      * @return неизменяемый список деклараций тестов
      */
-    List<TestDeclaration> getQueue();
+    ImmutableList<TestInstance<?>> getQueue();
 
     /**
      * Возвращает текущий размер очереди из тестов, которые еще не были запущены и ожидают начала исполнения

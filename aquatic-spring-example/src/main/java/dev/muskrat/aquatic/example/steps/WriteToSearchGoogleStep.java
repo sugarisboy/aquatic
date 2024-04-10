@@ -45,7 +45,7 @@ public class WriteToSearchGoogleStep {
         element.sendKeys(params.searchText);
         context.setSearch(params.searchText);
 
-        someService.call();
+        //someService.call();
     }
 
     public static Params searchCake() {
