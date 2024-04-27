@@ -1,6 +1,9 @@
 package dev.muskrat.aquatic.lib.common.execution.logic.impl;
 
+import com.codeborne.selenide.Selenide;
 import com.codeborne.selenide.WebDriverRunner;
+import dev.muskrat.aquatic.lib.common.dto.ScreenshotDto;
+import dev.muskrat.aquatic.lib.common.dto.TestStatus;
 import dev.muskrat.aquatic.lib.common.execution.StepInstance;
 import dev.muskrat.aquatic.lib.common.execution.TestInstance;
 import dev.muskrat.aquatic.lib.common.execution.TestInstanceImpl;
@@ -13,6 +16,7 @@ import dev.muskrat.aquatic.lib.common.events.logic.EventProducer;
 import dev.muskrat.aquatic.lib.selenide.DriverFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.openqa.selenium.OutputType;
 import org.openqa.selenium.chrome.ChromeDriver;
 
 @Slf4j
@@ -37,41 +41,35 @@ public class TestExecutorImpl implements TestExecutor {
             chromeDriver = (ChromeDriver) WebDriverRunner.getAndCheckWebDriver();
 
             testInstance.inProgress();
-
             eventProducer.startTest(testInstance);
 
-            boolean isSuccess = true;
-
-            for (int index = 0, stepIndex = 1; index < testInstance.getSteps().size(); index++, stepIndex++) {
-                StepInstance step = testInstance.getSteps().get(index);
-                StepStatus stepStatus = executeStep(stepIndex, testInstance, step);
-                if (stepStatus != StepStatus.SUCCESS) {
-                    log.warn("[TEST::{}::{}] Тест провален на шаге {}. {}", testInstance.getId(), testDeclaration.getName(),
-                            stepIndex, step.getDeclaration().getName());
-
-                    testInstance.failure();
-                    isSuccess = false;
-                    break;
-                }
-            }
-
-            for (int index = 0, stepIndex = 1; index < testInstance.getSteps().size(); index++, stepIndex++) {
-                StepInstance step = testInstance.getSteps().get(index);
-
-                if (!step.isFinished()) {
+            int stepNumber = 1;
+            boolean isSkippedNext = false;
+            for (StepInstance step : testInstance.getSteps()) {
+                if (isSkippedNext) {
                     log.info("[TEST::{}::{}] Шаг помечен как пропущенный {}. {}",
-                            testInstance.getId(),
-                            testDeclaration.getName(),
-                            stepIndex,
-                            step.getDeclaration().getName()
-                    );
+                            testInstance.getId(), testDeclaration.getName(), stepNumber, step.getDeclaration().getName());
                     step.skipped();
+                    eventProducer.skipStep(testInstance, step, new ScreenshotDto(Selenide.screenshot(OutputType.BYTES)));
+                } else {
+                    StepStatus stepStatus = executeStep(stepNumber, testInstance, step);
+                    if (stepStatus != StepStatus.SUCCESS) {
+                        log.warn("[TEST::{}::{}] Тест провален на шаге {}. {}", testInstance.getId(), testDeclaration.getName(),
+                                stepNumber, step.getDeclaration().getName());
+
+
+                        isSkippedNext = true;
+                    }
                 }
+
+                stepNumber++;
             }
 
-            if (isSuccess) {
+            if (testInstance.getStatus() != TestStatus.SUCCESS) {
                 testInstance.success();
                 log.info("[TEST::{}::{}] Тест успешно завершен!", testInstance.getId(), testDeclaration.getName());
+            } else {
+                testInstance.failure();
             }
 
             eventProducer.finishTest(testInstance);
@@ -80,6 +78,7 @@ public class TestExecutorImpl implements TestExecutor {
             throw new AquaticTestExecutionFailedException("Неизвестная ошибка при исполнении шагов теста", e);
         } finally {
             if (chromeDriver != null) {
+                log.info("Закрытие браузера");
                 chromeDriver.quit();
             }
             try {
@@ -94,12 +93,17 @@ public class TestExecutorImpl implements TestExecutor {
         try {
             log.info("[TEST::{}::{}::{}] Запуск шага", instance.getId(), stepInstance.getDeclaration().getName(), seqNumber);
             stepInstance.inProgress();
+            eventProducer.startStep(instance, stepInstance, new ScreenshotDto(Selenide.screenshot(OutputType.BYTES)));
+
+
             stepInstance.executeStep();
             log.info("[TEST::{}::{}::{}] Шаг успешно выполнен", instance.getId(), stepInstance.getDeclaration().getName(), seqNumber);
             stepInstance.success();
         } catch (Exception e) {
             log.error("[TEST::{}::{}::{}] Шаг провален", instance.getId(), stepInstance.getDeclaration().getName(), seqNumber, e);
             stepInstance.failure();
+        } finally {
+            eventProducer.finishStep(instance, stepInstance, new ScreenshotDto(Selenide.screenshot(OutputType.BYTES)));
         }
 
         return stepInstance.getStatus();

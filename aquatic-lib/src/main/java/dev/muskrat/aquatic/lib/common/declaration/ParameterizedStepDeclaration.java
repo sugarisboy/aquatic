@@ -2,6 +2,7 @@ package dev.muskrat.aquatic.lib.common.declaration;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import java.lang.reflect.Method;
@@ -14,6 +15,7 @@ import java.util.function.Supplier;
 @Builder
 @ToString
 @AllArgsConstructor
+@EqualsAndHashCode
 public class ParameterizedStepDeclaration {
 
     /**
@@ -24,6 +26,7 @@ public class ParameterizedStepDeclaration {
     /**
      * Консьюмер возвращающий параметризованный шаг
      */
+    @EqualsAndHashCode.Exclude
     private Supplier<Object> consumerParametrisedStep;
 
 }

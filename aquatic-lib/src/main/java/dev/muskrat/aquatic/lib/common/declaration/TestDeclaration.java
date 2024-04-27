@@ -2,9 +2,11 @@ package dev.muskrat.aquatic.lib.common.declaration;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Модель декларации теста
@@ -17,6 +19,7 @@ import java.util.List;
 @Builder
 @ToString
 @AllArgsConstructor
+@EqualsAndHashCode
 public class TestDeclaration {
 
 
@@ -38,6 +41,7 @@ public class TestDeclaration {
     /**
      * Тип контекста
      */
+    @EqualsAndHashCode.Exclude
     private Class<?> contextType;
 
     /**

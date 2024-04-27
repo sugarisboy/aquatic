@@ -7,7 +7,6 @@ import java.util.UUID;
 /**
  * Событие о факте запуска теста из очереди
  */
-@Data
 public class StartedTestEvent implements AbstractTestEvent {
 
     private final TestInstanceDto instance;

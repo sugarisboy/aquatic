@@ -12,6 +12,7 @@
     <modules>
         <module>aquatic-lib</module>
         <module>aquatic-spring-boot-starter</module>
+        <module>aquatic-reports-spring-boot-starter</module>
         <module>aquatic-spring-example</module>
     </modules>
 

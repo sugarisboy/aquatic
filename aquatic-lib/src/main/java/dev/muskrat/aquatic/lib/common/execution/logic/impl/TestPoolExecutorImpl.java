@@ -37,6 +37,8 @@ public class TestPoolExecutorImpl implements TestPoolExecutor {
 
         log.info("Тест {} добавлен в очередь", testDeclaration.getName());
 
+        eventProducer.addTestInQueue(instance);
+
         threadPoolExecutor.submit(() -> {
             try {
                 pollFirst().ifPresent(test -> {

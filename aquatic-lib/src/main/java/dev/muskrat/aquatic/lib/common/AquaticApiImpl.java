@@ -10,6 +10,7 @@ import dev.muskrat.aquatic.lib.common.events.logic.EventService;
 import dev.muskrat.aquatic.lib.common.mapper.MainMapper;
 import lombok.RequiredArgsConstructor;
 import java.util.List;
+import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -22,10 +23,10 @@ public class AquaticApiImpl implements AquaticApi {
     private final MainMapper mainMapper;
 
     @Override
-    public void addToQueueTestByDeclarationId(String code) {
+    public UUID addToQueueTestByDeclarationId(String code) {
         TestDeclaration test = declarationStorage.findTestDeclarationById(code)
                 .orElseThrow(() -> new IllegalArgumentException("Не найден тест с кодом = " + code));
-        testPoolExecutor.addToQueue(test);
+        return testPoolExecutor.addToQueue(test);
     }
 
     @Override

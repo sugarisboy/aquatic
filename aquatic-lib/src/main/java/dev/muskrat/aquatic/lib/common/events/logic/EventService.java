@@ -1,6 +1,7 @@
 package dev.muskrat.aquatic.lib.common.events.logic;
 
 import dev.muskrat.aquatic.lib.common.events.AbstractTestEvent;
+import dev.muskrat.aquatic.lib.common.events.AquaticBaseEvent;
 import java.util.function.Consumer;
 
 /**
@@ -8,7 +9,7 @@ import java.util.function.Consumer;
  * <p/>
  * Пример использования: Реализация хранения результатов теста в MongoDB с последующим анализом.
  * <p/>
- * Возможные события можно посмотреть в наследниках {@link AbstractTestEvent},
+ * Возможные события можно посмотреть в наследниках {@link AquaticBaseEvent},
  * для добавления собственных событий необходимо наследоваться от этого класса
  */
 public interface EventService {
@@ -17,7 +18,7 @@ public interface EventService {
      * Публикует событие для событийной системы
      * @param event событие
      */
-    void publish(AbstractTestEvent event);
+    void publish(AquaticBaseEvent event);
 
     /**
      * Добавляет обработчик события
@@ -25,5 +26,5 @@ public interface EventService {
      * @param handler обработчик
      * @param <T> тип события
      */
-    <T extends AbstractTestEvent> void  registerHandler(Class<T> eventType, Consumer<T> handler);
+    <T extends AquaticBaseEvent> void  registerHandler(Class<T> eventType, Consumer<T> handler);
 }

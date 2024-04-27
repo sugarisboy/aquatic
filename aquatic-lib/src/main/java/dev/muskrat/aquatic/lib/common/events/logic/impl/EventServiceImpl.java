@@ -1,11 +1,16 @@
 package dev.muskrat.aquatic.lib.common.events.logic.impl;
 
 import dev.muskrat.aquatic.lib.common.events.AbstractTestEvent;
+import dev.muskrat.aquatic.lib.common.events.AquaticBaseEvent;
 import dev.muskrat.aquatic.lib.common.events.logic.EventService;
 import dev.muskrat.aquatic.lib.common.exception.AquaticEventPublishingException;
 import lombok.extern.slf4j.Slf4j;
+import java.lang.reflect.Type;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
@@ -13,33 +18,20 @@ import java.util.function.Consumer;
 @Slf4j
 public class EventServiceImpl implements EventService {
 
-    private final ConcurrentHashMap<Class<? extends AbstractTestEvent>, List<Consumer<AbstractTestEvent>>> handlers = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Class<? extends AquaticBaseEvent>, List<Consumer<AquaticBaseEvent>>> handlers = new ConcurrentHashMap<>();
 
     @Override
-    public void publish(AbstractTestEvent event) {
+    public void publish(AquaticBaseEvent event) {
         if (event == null) {
             throw new NullPointerException("Event can't be is null");
         }
 
-        Class<?> eventClass = event.getClass();
-
-        while (eventClass != null) {
-            callForClass(eventClass, event);
-
-            if (eventClass != AbstractTestEvent.class) {
-                eventClass = eventClass.getSuperclass();
-            }
-        }
-
-        Class<?>[] interfaces = event.getClass().getInterfaces();
-        for (Class<?> anInterface : interfaces) {
-            callForClass(anInterface, event);
-        }
+        getAllSuperClassesAndInterfaces(event.getClass()).forEach(tClass -> callForClass(tClass, event));
     }
 
-    private void callForClass(Class<?> eventClass, AbstractTestEvent event) {
+    private void callForClass(Class<?> eventClass, AquaticBaseEvent event) {
         log.debug("Call event handlers for event = {} and class = {}", event.getClass().getSimpleName(), eventClass.getSimpleName());
-        for (Consumer<AbstractTestEvent> consumer : handlers.getOrDefault(eventClass, Collections.emptyList())) {
+        for (Consumer<AquaticBaseEvent> consumer : handlers.getOrDefault(eventClass, Collections.emptyList())) {
             try {
                 consumer.accept(event);
             } catch (Exception e) {
@@ -49,8 +41,8 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public <T extends AbstractTestEvent> void registerHandler(Class<T> eventType, Consumer<T> handler) {
-        List<Consumer<AbstractTestEvent>> consumers;
+    public <T extends AquaticBaseEvent> void registerHandler(Class<T> eventType, Consumer<T> handler) {
+        List<Consumer<AquaticBaseEvent>> consumers;
         if (handlers.containsKey(eventType)) {
             consumers = handlers.get(eventType);
         } else {
@@ -58,8 +50,35 @@ public class EventServiceImpl implements EventService {
             handlers.put(eventType, consumers);
         }
 
-        consumers.add((Consumer<AbstractTestEvent>) handler);
+        consumers.add((Consumer<AquaticBaseEvent>) handler);
 
         log.info("Зарегистрирован обработчик для {}", eventType);
+    }
+
+    private Set<Class<?>> getAllSuperClassesAndInterfaces(Class<?> tClass) {
+        Set<Class<?>> result = new HashSet<>();
+        Set<Class<?>> currentLevel = new HashSet<>();
+        currentLevel.add(tClass);
+
+        while (!currentLevel.isEmpty()) {
+            Set<Class<?>> nextLevel = new HashSet<>();
+            for (Class<?> currentClass : currentLevel) {
+                result.add(currentClass);
+                Type[] interfaces = currentClass.getGenericInterfaces();
+                for (Type type : interfaces) {
+                    if (type instanceof Class) {
+                        nextLevel.add((Class<?>) type);
+                    }
+                }
+
+                Class<?> superClass = currentClass.getSuperclass();
+                if (superClass != null) {
+                    nextLevel.add(superClass);
+                }
+            }
+            currentLevel = nextLevel;
+        }
+
+        return result;
     }
 }

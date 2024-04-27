@@ -18,6 +18,7 @@ import dev.muskrat.aquatic.lib.common.mapper.MainMapper;
 import dev.muskrat.aquatic.lib.common.mapper.MainMapperImpl;
 import dev.muskrat.aquatic.lib.selenide.DriverFactory;
 import java.util.List;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 public interface AquaticApi {
@@ -29,9 +30,11 @@ public interface AquaticApi {
     /**
      * Добавление в очередь теста по его ID декларации,
      * для получения всех возможных значений можно использовать {@link #getAllTestDeclarationIds()}
+     *
      * @param testDeclarationId ID теста из {@link dev.muskrat.aquatic.lib.common.declaration.TestDeclaration}
+     * @return
      */
-    void addToQueueTestByDeclarationId(String testDeclarationId);
+    UUID addToQueueTestByDeclarationId(String testDeclarationId);
 
     /**
      * Возвращает все известные на данный момент для API ID декларации тестов из {@link dev.muskrat.aquatic.lib.common.declaration.TestDeclaration}
@@ -67,7 +70,7 @@ public interface AquaticApi {
 
         AquaticApiSingleton() {
             DeclarationStorage declarationStorage = new DeclarationStorageImpl();
-            DriverFactory driverFactory = new DriverFactory();
+            DriverFactory driverFactory = new DriverFactory(null);
             EventService eventService = new EventServiceImpl();
             TestInstanceFactory testInstanceFactory = new TestInstanceFactoryImpl();
             MainMapper mapper = new MainMapperImpl();

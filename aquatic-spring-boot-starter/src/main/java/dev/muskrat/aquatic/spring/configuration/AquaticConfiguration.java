@@ -10,6 +10,7 @@ import dev.muskrat.aquatic.lib.common.declaration.logic.StepDeclarationReader;
 import dev.muskrat.aquatic.lib.common.declaration.logic.impl.StepDeclarationReaderImpl;
 import dev.muskrat.aquatic.lib.common.declaration.logic.TestDeclarationReader;
 import dev.muskrat.aquatic.lib.common.declaration.logic.impl.TestDeclarationReaderImpl;
+import dev.muskrat.aquatic.lib.common.events.AquaticBaseEvent;
 import dev.muskrat.aquatic.lib.common.execution.logic.TestInstanceFactory;
 import dev.muskrat.aquatic.lib.common.execution.logic.impl.TestInstanceFactoryImpl;
 import dev.muskrat.aquatic.lib.common.execution.logic.TestPoolExecutor;
@@ -93,7 +94,7 @@ public class AquaticConfiguration {
             @Autowired ApplicationEventPublisher applicationEventPublisher
     ) {
         EventServiceImpl eventService = new EventServiceImpl();
-        eventService.registerHandler(AbstractTestEvent.class, event -> {
+        eventService.registerHandler(AquaticBaseEvent.class, event -> {
             applicationEventPublisher.publishEvent(event);
         });
         return eventService;

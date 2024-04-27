@@ -2,6 +2,7 @@ package dev.muskrat.aquatic.lib.common.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +12,7 @@ import java.util.UUID;
  * Экземпляр теста в для конкретного запуска
  */
 @Getter
+@EqualsAndHashCode
 @AllArgsConstructor
 public class TestInstanceDto {
 

@@ -2,6 +2,7 @@ package dev.muskrat.aquatic.example.steps;
 
 import static com.codeborne.selenide.Selenide.$x;
 
+import com.codeborne.selenide.Selenide;
 import dev.muskrat.aquatic.example.contexts.GoogleTestContext;
 import dev.muskrat.aquatic.example.service.SomeService;
 import dev.muskrat.aquatic.example.service.SomeServiceImpl;
@@ -13,6 +14,7 @@ import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
+import org.openqa.selenium.OutputType;
 import org.openqa.selenium.WebElement;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -44,6 +46,7 @@ public class WriteToSearchGoogleStep {
         WebElement element = $x("//textarea");
         element.sendKeys(params.searchText);
         context.setSearch(params.searchText);
+
 
         //someService.call();
     }

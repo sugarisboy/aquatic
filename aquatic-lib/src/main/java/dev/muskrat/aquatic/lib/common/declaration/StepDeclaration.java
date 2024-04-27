@@ -2,6 +2,7 @@ package dev.muskrat.aquatic.lib.common.declaration;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import java.lang.reflect.Method;
@@ -43,21 +44,25 @@ public class StepDeclaration {
      * Хранится значение {@code true} если шаг был объявлен в обособленном классе,
      * с аннотацией {@link dev.muskrat.aquatic.lib.common.annotations.AquaticStep}
      */
+    @EqualsAndHashCode.Exclude
     private boolean isAnnouncedAsClass;
 
     /**
      * Тип контекста
      */
+    @EqualsAndHashCode.Exclude
     private Class<?> contextType;
 
     /**
      * Ссылка на исполняемый метод данного шага
      */
+    @EqualsAndHashCode.Exclude
     private transient Method executionMethod;
 
     /**
      * Ссылка на созданный инстанс класса, где размещен метод {@link #executionMethod}
      */
+    @EqualsAndHashCode.Exclude
     private transient Object instanceOfClass;
 
 }

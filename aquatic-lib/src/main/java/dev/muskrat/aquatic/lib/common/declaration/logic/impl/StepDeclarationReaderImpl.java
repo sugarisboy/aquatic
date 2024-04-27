@@ -44,12 +44,16 @@ public class StepDeclarationReaderImpl implements StepDeclarationReader {
         Parameter contextParameter = parameters[0];
         Class<?> contextParameterType = contextParameter.getType();
 
-        return fromAnnotation(step)
-                .executionMethod(executionMethod.get().method())
-                .contextType(contextParameterType)
-                .isAnnouncedAsClass(true)
-                .instanceOfClass(instanceOfClass)
-                .build();
+        return new StepDeclaration(
+                step.id(),
+                step.name(),
+                step.preCondition(),
+                step.postCondition(),
+                true,
+                contextParameterType,
+                executionMethod.get().method(),
+                instanceOfClass
+        );
     }
 
     @Override
@@ -60,21 +64,17 @@ public class StepDeclarationReaderImpl implements StepDeclarationReader {
     }
 
     private StepDeclaration fromAnnotatedMethod(AnnotationUtils.AnnotatedMethod<AquaticStep> m, Object instanceOfClass) {
-        return fromAnnotation(m.annotation())
-                .executionMethod(m.method())
-                .contextType(m.method().getReturnType())
-                .isAnnouncedAsClass(false)
-                .instanceOfClass(instanceOfClass)
-                .build();
-    }
-
-
-    private StepDeclaration.StepDeclarationBuilder fromAnnotation(AquaticStep aquaticStep) {
-        return StepDeclaration.builder()
-                .id(aquaticStep.id())
-                .name(aquaticStep.name())
-                .preCondition(aquaticStep.preCondition())
-                .postCondition(aquaticStep.postCondition());
+        AquaticStep annotation = m.annotation();
+        return new StepDeclaration(
+                annotation.id(),
+                annotation.name(),
+                annotation.preCondition(),
+                annotation.postCondition(),
+                false,
+                m.method().getReturnType(),
+                m.method(),
+                instanceOfClass
+        );
     }
 
     /**
