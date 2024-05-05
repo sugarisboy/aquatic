@@ -8,10 +8,13 @@ import dev.muskrat.aquatic.common.AbstractIT;
 import dev.muskrat.aquatic.lib.AquaticApi;
 import dev.muskrat.aquatic.lib.common.dto.StepStatus;
 import dev.muskrat.aquatic.lib.common.events.FinishedTestEvent;
+import dev.muskrat.aquatic.spring.dto.StepResultDto;
+import dev.muskrat.aquatic.spring.dto.TestResultDto;
 import dev.muskrat.aquatic.spring.model.StepResult;
 import dev.muskrat.aquatic.spring.model.TestResult;
 import dev.muskrat.aquatic.spring.repository.StepResultRepository;
 import dev.muskrat.aquatic.spring.repository.TestResultRepository;
+import dev.muskrat.aquatic.spring.service.TestService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
@@ -29,6 +32,9 @@ class AquaticApplicationTests extends AbstractIT {
 	SomeService someService;*/
 
 	@Autowired
+	TestService testService;
+
+	@Autowired
 	StepResultRepository stepResultRepository;
 
 	@Autowired
@@ -41,7 +47,7 @@ class AquaticApplicationTests extends AbstractIT {
 			countDownLatch.countDown();
 		});
 
-		System.setProperty("webdriver.chrome.driver", "../chromedriver.exe");
+		System.setProperty("webdriver.chrome.driver", "../chromedriver");
 		assertNotNull(aquaticApi.getAllTestDeclarationIds());
 
 		String testId = aquaticApi.getAllTestDeclarationIds().get(0);
@@ -51,13 +57,12 @@ class AquaticApplicationTests extends AbstractIT {
 		boolean await = countDownLatch.await(400, TimeUnit.SECONDS);
 		assertTrue(await);
 
-		TestResult testResult = testResultRepository.findById(executionId).orElse(null);
+		TestResultDto testResult = testService.getResultByExecutionId(executionId);
 		assertNotNull(testResult);
 
-		List<StepResult> stepResults = testResult.getStepResults();
+		List<StepResultDto> stepResults = testResult.getStepResults();
 
-		List<StepResult> successStepResults = stepResults.stream()
-				.filter(result -> result.getTestResult().getId().equals(executionId))
+		List<StepResultDto> successStepResults = stepResults.stream()
 				.filter(result -> result.getStatus() == StepStatus.SUCCESS)
 				.collect(Collectors.toList());
 

@@ -10,9 +10,11 @@ import dev.muskrat.aquatic.spring.repository.StepResultRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -20,13 +22,14 @@ public class StepServiceImpl implements StepService {
 
     private final StepRepository stepRepository;
     private final StepResultRepository stepResultRepository;
+    private final CheckSumService checkSumService;
 
     @Override
     public Step getOrCreate(StepDeclarationDto stepDeclaration) {
-        Step actualTest = getActualStep(stepDeclaration);
+        Step actualStep = getActualStep(stepDeclaration);
 
 
-        return actualTest;
+        return actualStep;
     }
 
     @Override
@@ -53,12 +56,16 @@ public class StepServiceImpl implements StepService {
         stepResultRepository.save(stepResult);
     }
 
+
+
     private Step getActualStep(StepDeclarationDto declaration) {
         String code = declaration.getId();
         Step createdStepInstance = stepRepository.findFirstByCodeOrderByVersionDesc(code).orElse(null);
 
+        int actualCheckSum = checkSumService.calculateCheckSum(declaration);
+
         boolean isExistActualVersion = createdStepInstance != null
-                && createdStepInstance.getHash() == declaration.hashCode();
+                && createdStepInstance.getHash() == actualCheckSum;
 
         if (isExistActualVersion) {
             return createdStepInstance;
@@ -66,7 +73,7 @@ public class StepServiceImpl implements StepService {
 
         int newVersion = createdStepInstance == null ? 1 : createdStepInstance.getVersion() + 1;
 
-        return new Step(
+        Step step = new Step(
                 null,
                 declaration.getId(),
                 declaration.hashCode(),
@@ -76,5 +83,9 @@ public class StepServiceImpl implements StepService {
                 declaration.getPostCondition(),
                 null
         );
+
+        log.info("Инициализирован новый шаг: {}", step);
+
+        return step;
     }
 }

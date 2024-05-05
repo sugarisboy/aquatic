@@ -60,6 +60,8 @@ public class DriverFactory {
         options.addArguments("ignore-certificate-errors");
         options.addArguments("--remote-allow-origins=*");
 
+        DesiredCapabilities capabilities = new DesiredCapabilities();
+
         if (isWindows()) {
             //options.addArguments("--auto-open-devtools-for-tabs");
 
@@ -70,18 +72,20 @@ public class DriverFactory {
                 Configuration.headless = false;
                 Configuration.holdBrowserOpen = true;
             }
-            options.addArguments("--disable-gpu"); // applicable to windows os only
+
+
+            capabilities.setCapability(InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS, true);
+            capabilities.setCapability("ie.ensureCleanSession", true);
+            capabilities.setCapability("ie.usePerProcessProxy", true);
+            capabilities.setCapability("ie.browserCommandLineSwitches", "-private");
+            capabilities.setCapability("requireWindowFocus", false);
+
+            //options.addArguments("--disable-gpu"); // applicable to windows os only
         } else {
             System.setProperty("webdriver.chrome.driver",  Objects.requireNonNullElse(chromedriverPath, "chromedriver"));
             Configuration.headless = true;
         }
 
-        DesiredCapabilities capabilities = new DesiredCapabilities();
-        capabilities.setCapability(InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS, true);
-        capabilities.setCapability("ie.ensureCleanSession", true);
-        capabilities.setCapability("ie.usePerProcessProxy", true);
-        capabilities.setCapability("ie.browserCommandLineSwitches", "-private");
-        capabilities.setCapability("requireWindowFocus", false);
         capabilities.setCapability(ChromeOptions.CAPABILITY, options);
         capabilities.setAcceptInsecureCerts(true);
         //capabilities.setCapability(CapabilityType.UNEXPECTED_ALERT_BEHAVIOUR, UnexpectedAlertBehaviour.IGNORE);

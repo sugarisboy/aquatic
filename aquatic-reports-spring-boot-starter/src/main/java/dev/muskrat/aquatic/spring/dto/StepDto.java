@@ -30,5 +30,5 @@ public class StepDto {
 
     private String postCondition;
 
-    private TestDto test;
+    //private TestDto test;
 }

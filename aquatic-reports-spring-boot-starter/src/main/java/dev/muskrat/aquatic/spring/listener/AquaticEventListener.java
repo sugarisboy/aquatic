@@ -30,12 +30,12 @@ public class AquaticEventListener {
 
     @EventListener
     public void handleFinishTest(FinishedTestEvent event) {
-
+        testService.finish(event.getInstance());
     }
 
     @EventListener
     public void handleStartEvent(StartedTestEvent event) {
-
+        testService.start(event.getInstance());
     }
 
     @EventListener
