@@ -11,7 +11,7 @@ public class ScreenshotDto {
     @Getter
     private final byte[] content;
 
-    private String base64() {
+    public String base64() {
         return Base64.getEncoder().encodeToString(content);
     }
 }

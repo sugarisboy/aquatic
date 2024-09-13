@@ -45,7 +45,7 @@ public class AquaticEventListener {
 
     @EventListener
     public void handleFinishStepEvent(FinishedStepEvent event) {
-        stepService.finish(event.getStep(), event.getTest());
+        stepService.finish(event.getStep(), event.getTest(), event.getScreenshot());
     }
 
     @Order(Ordered.HIGHEST_PRECEDENCE)

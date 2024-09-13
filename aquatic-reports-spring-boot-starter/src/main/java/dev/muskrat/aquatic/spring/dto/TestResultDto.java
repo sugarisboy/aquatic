@@ -28,9 +28,7 @@ public class TestResultDto {
 
     private TestStatus status;
 
-/*    @OneToMany
-    @SQLRestriction("holder == 'TEST_ATTACHMENT'")
-    private List<TestAttachment> attachments;*/
+    private List<TestAttachmentDto> attachments;
 
     private TestDto test;
 

@@ -35,8 +35,8 @@ public class TestResult {
     @Enumerated(EnumType.STRING)
     private TestStatus status;
 
-    @OneToMany
-    @SQLRestriction("holder == 'TEST_ATTACHMENT'")
+    @OneToMany(mappedBy = "testResult", cascade = CascadeType.ALL)
+    //@SQLRestriction("holder == 'TEST_ATTACHMENT'")
     private List<TestAttachment> attachments;
 
     @ManyToOne(cascade = CascadeType.ALL)

@@ -1,10 +1,14 @@
 package dev.muskrat.aquatic.spring.service;
 
+import dev.muskrat.aquatic.lib.common.dto.ScreenshotDto;
 import dev.muskrat.aquatic.lib.common.dto.StepDeclarationDto;
 import dev.muskrat.aquatic.lib.common.dto.StepInstanceDto;
 import dev.muskrat.aquatic.lib.common.dto.TestInstanceDto;
 import dev.muskrat.aquatic.spring.model.Step;
 import dev.muskrat.aquatic.spring.model.StepResult;
+import dev.muskrat.aquatic.spring.model.TestAttachment;
+import dev.muskrat.aquatic.spring.model.enums.AttachmentHolder;
+import dev.muskrat.aquatic.spring.model.enums.AttachmentType;
 import dev.muskrat.aquatic.spring.repository.StepRepository;
 import dev.muskrat.aquatic.spring.repository.StepResultRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -45,7 +49,7 @@ public class StepServiceImpl implements StepService {
     }
 
     @Override
-    public void finish(StepInstanceDto step, TestInstanceDto test) {
+    public void finish(StepInstanceDto step, TestInstanceDto test, ScreenshotDto screenshot) {
         String stepCode = step.getDeclaration().getId();
         UUID executionId = test.getExecutionId();
 
@@ -53,6 +57,9 @@ public class StepServiceImpl implements StepService {
                 .orElseThrow(() -> new EntityNotFoundException(String.format("Не найден StepResult для [%s, %s]", step, executionId)));
 
         stepResult.setStatus(step.getStatus());
+
+        stepResult.addAttachment(new TestAttachment(screenshot.base64(), AttachmentType.SCREENSHOT));
+
         stepResultRepository.save(stepResult);
     }
 

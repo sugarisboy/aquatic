@@ -34,7 +34,7 @@ public class AbstractIT {
 
     @Container
     public static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>("postgres:15-alpine")
-            .withReuse(true)
+            .withReuse(false)
             .withDatabaseName("autoqa")
             .withUsername("autoqa")
             .withPassword("autoqa");

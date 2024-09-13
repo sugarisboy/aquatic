@@ -1,6 +1,6 @@
 package dev.muskrat.aquatic.spring.service;
 
-import dev.muskrat.aquatic.lib.common.declaration.StepDeclaration;
+import dev.muskrat.aquatic.lib.common.dto.ScreenshotDto;
 import dev.muskrat.aquatic.lib.common.dto.StepDeclarationDto;
 import dev.muskrat.aquatic.lib.common.dto.StepInstanceDto;
 import dev.muskrat.aquatic.lib.common.dto.TestInstanceDto;
@@ -11,5 +11,5 @@ public interface StepService {
 
     void start(StepInstanceDto step, TestInstanceDto test);
 
-    void finish(StepInstanceDto step, TestInstanceDto test);
+    void finish(StepInstanceDto step, TestInstanceDto test, ScreenshotDto screenshot);
 }

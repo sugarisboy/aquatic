@@ -1,34 +1,32 @@
 package dev.muskrat.aquatic.spring.dto;
 
 import dev.muskrat.aquatic.lib.common.dto.StepStatus;
+import dev.muskrat.aquatic.spring.model.StepResult;
 import dev.muskrat.aquatic.spring.model.TestAttachment;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
+import dev.muskrat.aquatic.spring.model.TestResult;
+import dev.muskrat.aquatic.spring.model.enums.AttachmentHolder;
+import dev.muskrat.aquatic.spring.model.enums.AttachmentType;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.SQLRestriction;
+import lombok.ToString;
 import java.util.List;
 import java.util.UUID;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class StepResultDto {
+public class TestAttachmentDto {
 
     private UUID id;
-
-    private StepStatus status;
-
-    private List<TestAttachmentDto> attachments;
-
-    private StepDto step;
+    private AttachmentHolder holder;
+    private AttachmentType type;
+    private String content;
+    private UUID stepResultId;
+    private UUID testResultId;
 }

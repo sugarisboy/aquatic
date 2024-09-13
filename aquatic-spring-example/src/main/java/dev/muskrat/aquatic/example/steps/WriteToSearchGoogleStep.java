@@ -30,9 +30,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 @AllArgsConstructor
 public class WriteToSearchGoogleStep {
 
-    @Autowired
-    SomeService someService;
-
     @Builder
     public static class Params {
 
@@ -46,9 +43,6 @@ public class WriteToSearchGoogleStep {
         WebElement element = $x("//textarea");
         element.sendKeys(params.searchText);
         context.setSearch(params.searchText);
-
-
-        //someService.call();
     }
 
     public static Params searchCake() {

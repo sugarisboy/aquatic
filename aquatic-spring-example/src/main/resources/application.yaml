@@ -11,3 +11,7 @@ springdoc:
   api-docs:
     path: /api-docs
 
+logging:
+  level:
+    dev.muskrat: DEBUG
+

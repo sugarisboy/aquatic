@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.chrome.ChromeDriver;
+import java.util.UUID;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -26,9 +27,12 @@ public class TestExecutorImpl implements TestExecutor {
     private final DriverFactory driverFactory;
     private final EventProducer eventProducer;
 
+    private static final ThreadLocal<UUID> testRunId = new ThreadLocal<>();
+
     @Override
     public void execute(TestInstance<?> testInstance) {
         TestDeclaration testDeclaration = testInstance.getDeclaration();
+        testRunId.set(testInstance.getId());
 
         log.info("[TEST::{}::{}] Запуск теста", testInstance.getId(), testDeclaration.getName());
         ChromeDriver chromeDriver = null;
@@ -81,11 +85,15 @@ public class TestExecutorImpl implements TestExecutor {
                 log.info("Закрытие браузера");
                 chromeDriver.quit();
             }
+
+            testRunId.remove();
+
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
+
         }
     }
 
@@ -107,5 +115,9 @@ public class TestExecutorImpl implements TestExecutor {
         }
 
         return stepInstance.getStatus();
+    }
+
+    public static UUID getTestRunId() {
+        return testRunId.get();
     }
 }

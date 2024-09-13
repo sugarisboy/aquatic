@@ -7,11 +7,13 @@ import dev.muskrat.aquatic.lib.common.dto.TestInstanceDto;
 import dev.muskrat.aquatic.lib.common.dto.TestStatus;
 import dev.muskrat.aquatic.spring.dto.StepDto;
 import dev.muskrat.aquatic.spring.dto.StepResultDto;
+import dev.muskrat.aquatic.spring.dto.TestAttachmentDto;
 import dev.muskrat.aquatic.spring.dto.TestDto;
 import dev.muskrat.aquatic.spring.dto.TestResultDto;
 import dev.muskrat.aquatic.spring.model.Step;
 import dev.muskrat.aquatic.spring.model.StepResult;
 import dev.muskrat.aquatic.spring.model.Test;
+import dev.muskrat.aquatic.spring.model.TestAttachment;
 import dev.muskrat.aquatic.spring.model.TestResult;
 import dev.muskrat.aquatic.spring.repository.TestRepository;
 import dev.muskrat.aquatic.spring.repository.TestResultRepository;
@@ -162,6 +164,7 @@ public class TestServiceImpl implements TestService {
         return new StepResultDto(
                 entity.getId(),
                 entity.getStatus(),
+                entity.getAttachments().stream().map(this::convert).toList(),
                 convert(entity.getStep())
         );
     }
@@ -169,8 +172,22 @@ public class TestServiceImpl implements TestService {
         return new TestResultDto(
                 entity.getId(),
                 entity.getStatus(),
+                entity.getAttachments().stream().map(this::convert).toList(),
                 convert(entity.getTest()),
                 entity.getStepResults().stream().map(this::convert).toList()
         );
     }
+
+    private TestAttachmentDto convert(TestAttachment entity) {
+        return new TestAttachmentDto(
+                entity.getId(),
+                entity.getHolder(),
+                entity.getType(),
+                entity.getContent(),
+                entity.getStepResult() == null ? null : entity.getStepResult().getId(),
+                entity.getTestResult() == null ? null : entity.getTestResult().getId()
+        );
+    }
+
+
 }

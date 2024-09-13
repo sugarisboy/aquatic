@@ -1,6 +1,7 @@
 package dev.muskrat.aquatic;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -9,6 +10,7 @@ import dev.muskrat.aquatic.lib.AquaticApi;
 import dev.muskrat.aquatic.lib.common.dto.StepStatus;
 import dev.muskrat.aquatic.lib.common.events.FinishedTestEvent;
 import dev.muskrat.aquatic.spring.dto.StepResultDto;
+import dev.muskrat.aquatic.spring.dto.TestAttachmentDto;
 import dev.muskrat.aquatic.spring.dto.TestResultDto;
 import dev.muskrat.aquatic.spring.model.StepResult;
 import dev.muskrat.aquatic.spring.model.TestResult;
@@ -47,7 +49,7 @@ class AquaticApplicationTests extends AbstractIT {
 			countDownLatch.countDown();
 		});
 
-		System.setProperty("webdriver.chrome.driver", "../chromedriver");
+		System.setProperty("webdriver.chrome.driver", "../chromedriver.exe");
 		assertNotNull(aquaticApi.getAllTestDeclarationIds());
 
 		String testId = aquaticApi.getAllTestDeclarationIds().get(0);
@@ -64,9 +66,15 @@ class AquaticApplicationTests extends AbstractIT {
 
 		List<StepResultDto> successStepResults = stepResults.stream()
 				.filter(result -> result.getStatus() == StepStatus.SUCCESS)
-				.collect(Collectors.toList());
+				.toList();
 
 		assertEquals(3, successStepResults.size());
+
+		assertNotEquals(0, testResult.getAttachments().size());
+		assertNotEquals(0, stepResults.get(0).getAttachments().size());
+
+		List<TestAttachmentDto> attachments = stepResults.get(0).getAttachments();
+		System.out.println("Вложения: " + attachments);
 	}
 
 	@Test
